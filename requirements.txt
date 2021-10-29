@@ -1,0 +1,7 @@
+sys
+os.path
+catte
+PySide6
+PIL
+crcmod
+bleak
