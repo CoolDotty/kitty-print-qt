@@ -105,7 +105,8 @@ class Form(QDialog):
         cursor_line = self.edit.textCursor().block().firstLineNumber()
         line_count = self.edit.document().blockCount()
         scroll_height = self.pic.verticalScrollBar().maximum()
-        self.pic.verticalScrollBar().setValue(cursor_line / line_count * scroll_height)
+        approx_cursor_pos = int(cursor_line / line_count * scroll_height)
+        self.pic.verticalScrollBar().setValue(approx_cursor_pos)
 
     # Greets the user
     def save_image(self):
