@@ -1,3 +1,7 @@
+# This is a fork of PyCatte
+# By JJJollyjim
+# https://github.com/JJJollyjim
+
 import asyncio
 import crcmod.predefined
 from bleak import BleakClient
