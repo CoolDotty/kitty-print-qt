@@ -30,6 +30,8 @@ class Main(QWidget):
         self.pic.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.pic.setAlignment(Qt.AlignTop)
         self.pic.setObjectName("pic")
+        self.pic.setStyleSheet(
+            "QGraphicsView { max-width: 324px; }")
         self.update_preview()
 
         self.button = QPushButton("Print!")
@@ -97,6 +99,8 @@ class Main(QWidget):
         item = QGraphicsPixmapItem(pixmap)
         scene.addItem(item)
         self.pic.setScene(scene)
+        self.pic.fitInView(scene.sceneRect(),
+                           Qt.KeepAspectRatio)
 
         # Scroll to match vertical position of cursor
         cursor_line = self.edit.textCursor().block().firstLineNumber()
