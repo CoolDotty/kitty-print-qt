@@ -62,7 +62,7 @@ async def run():
             await client.write_gatt_char(char, buf[0:mtu], True)
             buf = buf[mtu:]
             print(".", end="", flush=True)
-            time.sleep(0.02)
+            time.sleep(0.05)
 
         if len(buf) > 0:
             await client.write_gatt_char(char, buf, True)
