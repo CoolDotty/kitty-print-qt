@@ -1,13 +1,14 @@
 import sys
+import io
 import os.path
 import catte
 from PyQt5.QtWidgets import (
     QPlainTextEdit, QPushButton, QApplication, QVBoxLayout,
     QWidget, QGraphicsView, QFrame, QAbstractScrollArea, QGraphicsScene, QGraphicsPixmapItem)
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QRectF
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from PIL.ImageQt import ImageQt
-from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
 
@@ -30,8 +31,13 @@ class Main(QWidget):
         self.pic.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.pic.setAlignment(Qt.AlignTop)
         self.pic.setObjectName("pic")
-        self.pic.setStyleSheet(
-            "QGraphicsView { max-width: 324px; }")
+        self.pic.setStyleSheet("""
+            QGraphicsView { 
+                max-width: 324px; 
+                max-height: 324px;
+                background: transparent; 
+            }
+        """)
         self.update_preview()
 
         self.button = QPushButton("Print!")
@@ -68,17 +74,22 @@ class Main(QWidget):
 
         lines = []
         for p in paragraphs:
-            lines += textwrap.wrap(
+            wrapped = textwrap.wrap(
                 p,
                 width=int(im.size[0] / font_width),
-                replace_whitespace=False)
+                replace_whitespace=False,
+                drop_whitespace=False)
+            if (len(wrapped) > 0):
+                lines += wrapped
+            else:
+                lines += ['']
 
         lineCount = len(lines)
 
         # Resize image to fit number of lines
         newCanvasSize = (
             im.size[0],
-            max(line_height, line_height * lineCount))
+            max(324, line_height * lineCount))
         im = im.resize(newCanvasSize)
 
         # Draw text on image
@@ -89,20 +100,29 @@ class Main(QWidget):
             fill=(0, 0, 0),
             font=font)
 
-        return im
+        # Convert to black and white
+        bw = None
+        should_dither = True
+        if should_dither:
+            bw = im.convert("1", dither=Image.FLOYDSTEINBERG)
+        else:
+            bw = im.point(lambda x: 0 if x < 128 else 255, '1')
+
+        qi = ImageQt(bw)
+
+        return qi
 
     def update_preview(self):
         # Update preview image
         im = self.generate_image()
         scene = QGraphicsScene(self)
-        pixmap = QPixmap.fromImage(ImageQt(im))
+        pixmap = QPixmap.fromImage(im)
         item = QGraphicsPixmapItem(pixmap)
         scene.addItem(item)
         self.pic.setScene(scene)
-        self.pic.fitInView(scene.sceneRect(),
-                           Qt.KeepAspectRatio)
 
         # Scroll to match vertical position of cursor
+        # TODO: excessively long lines break this
         cursor_line = self.edit.textCursor().block().firstLineNumber()
         line_count = self.edit.document().blockCount()
         scroll_height = self.pic.verticalScrollBar().maximum()
