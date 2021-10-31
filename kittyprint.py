@@ -2,8 +2,8 @@ import sys
 import os.path
 import catte
 from PyQt5.QtWidgets import (
-    QPlainTextEdit, QPushButton, QApplication, QVBoxLayout, QDialog,
-    QLabel, QGraphicsView, QFrame, QAbstractScrollArea, QGraphicsScene, QGraphicsPixmapItem)
+    QPlainTextEdit, QPushButton, QApplication, QVBoxLayout,
+    QWidget, QGraphicsView, QFrame, QAbstractScrollArea, QGraphicsScene, QGraphicsPixmapItem)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QSize
 from PIL.ImageQt import ImageQt
@@ -11,19 +11,17 @@ from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
 
-class Form(QDialog):
+class Main(QWidget):
 
     def __init__(self, parent=None):
-        super(Form, self).__init__(parent)
+        super(Main, self).__init__(parent)
         # Create widgets
         self.edit = QPlainTextEdit()
         self.edit.setPlaceholderText("Write text here")
         self.edit.textChanged.connect(self.update_preview)
         self.edit.cursorPositionChanged.connect(self.update_preview)
-        self.edit.setStyleSheet("QPlainTextEdit { min-height: 15em; }")
 
         self.pic = QGraphicsView()
-        self.pic.setStyleSheet("QGraphicsView { min-height: 15em }")
         self.pic.setSizeIncrement(QSize(0, 0))
         self.pic.setFrameShadow(QFrame.Raised)
         self.pic.setSizeAdjustPolicy(
@@ -44,7 +42,6 @@ class Form(QDialog):
 
         # Set dialog layout
         self.setLayout(layout)
-        self.setStyleSheet("QDialog { min-width: 400px }")
 
         # Add button signal to greetings slot
         self.button.clicked.connect(self.save_image)
@@ -57,9 +54,9 @@ class Form(QDialog):
         # Draw Text
         script_path = os.path.abspath(os.path.dirname(__file__))
         font_path = os.path.join(script_path, 'RobotoMono.ttf')
-        font = ImageFont.truetype(font=font_path, size=24)
+        font = ImageFont.truetype(font=font_path, size=15)
         ascent, descent = font.getmetrics()
-        (font_width, baseline) = font.getsize('0')
+        (font_width, baseline) = font.getsize('M')
         line_height = ascent + descent
 
         # Convert input to string with newlines
@@ -71,7 +68,7 @@ class Form(QDialog):
         for p in paragraphs:
             lines += textwrap.wrap(
                 p,
-                width=int(im.size[0] / font_width - 1),
+                width=int(im.size[0] / font_width),
                 replace_whitespace=False)
 
         lineCount = len(lines)
@@ -118,7 +115,7 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
-    form = Form()
-    form.show()
+    main = Main()
+    main.show()
     # Run the main Qt loop
     sys.exit(app.exec())
