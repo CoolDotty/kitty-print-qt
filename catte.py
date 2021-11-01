@@ -28,8 +28,9 @@ def make_command(cmd, payload):
     return bytes(msg)
 
 
-async def run():
-    im = sys.stdin.buffer.read()
+async def run(bdaddr, image, feed_after, mtu):
+
+    im = image
     assert im[0:
               3] == b"P4\n", f"stdin was not a P4 PBM file, first 3 bytes: {im[0:3]}"
     im = im[3:]
@@ -50,17 +51,15 @@ async def run():
             0xA2, bytes(map(good_function, im[(i * 48): ((i + 1) * 48)]))
         )
 
-    if args.feed_after > 0:
+    if feed_after > 0:
         buf += make_command(
-            0xA1, bytes([args.feed_after % 256, args.feed_after // 256])
+            0xA1, bytes([feed_after % 256, feed_after // 256])
         )
 
     print("Connecting... ", end="", flush=True)
-    async with BleakClient(args.bdaddr) as client:
+    async with BleakClient(bdaddr) as client:
         print("Connected.", flush=True)
         print("Sending", end="", flush=True)
-
-        mtu = args.mtu
 
         while len(buf) > mtu:
             await client.write_gatt_char(char, buf[0:mtu], True)
@@ -98,4 +97,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    loop.run_until_complete(
+        run(args.bdaddr, sys.stdin.buffer.read(), args.feed_after, args.mtu))
