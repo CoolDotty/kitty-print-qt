@@ -10,6 +10,7 @@ from PyQt5.QtCore import Qt, QSize, QRectF
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from PIL.ImageQt import ImageQt
 import textwrap
+import asyncio
 
 
 class Main(QWidget):
@@ -33,9 +34,9 @@ class Main(QWidget):
         self.pic.setObjectName("pic")
         self.pic.setStyleSheet("""
             QGraphicsView { 
-                max-width: 324px; 
-                max-height: 324px;
-                background: transparent; 
+                max-width: 384px; 
+                max-height: 384px;
+                background: white; 
             }
         """)
         self.update_preview()
@@ -56,7 +57,7 @@ class Main(QWidget):
 
     def generate_image(self):
         # Clear Image
-        im = Image.new(mode="RGBA", size=(324, 1),
+        im = Image.new(mode="RGBA", size=(384, 1),
                        color=(255, 255, 255, 255))
 
         # Draw Text
@@ -89,7 +90,7 @@ class Main(QWidget):
         # Resize image to fit number of lines
         newCanvasSize = (
             im.size[0],
-            max(324, line_height * lineCount))
+            max(line_height, line_height * lineCount))
         im = im.resize(newCanvasSize)
 
         # Draw text on image
@@ -108,15 +109,15 @@ class Main(QWidget):
         else:
             bw = im.point(lambda x: 0 if x < 128 else 255, '1')
 
-        qi = ImageQt(bw)
-
-        return qi
+        return bw
 
     def update_preview(self):
         # Update preview image
         im = self.generate_image()
+
+        qi = ImageQt(im)
         scene = QGraphicsScene(self)
-        pixmap = QPixmap.fromImage(im)
+        pixmap = QPixmap.fromImage(qi)
         item = QGraphicsPixmapItem(pixmap)
         scene.addItem(item)
         self.pic.setScene(scene)
@@ -132,7 +133,20 @@ class Main(QWidget):
     # Greets the user
     def save_image(self):
         im = self.generate_image()
-        im.save('catapp.png')
+
+        buf = io.BytesIO()
+        im.save(buf, format='PPM')
+        image_buffer = buf.getvalue()
+
+        loop = asyncio.get_event_loop()
+
+        async def coroutine():
+            try:
+                await catte.run('60:16:55:C1:AE:10', image_buffer, 128, 25)
+            except:
+                print('Error connecting.')
+
+        loop.run_until_complete(coroutine())
 
 
 if __name__ == '__main__':
