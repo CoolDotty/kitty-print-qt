@@ -62,8 +62,8 @@ class Main(QWidget):
 
         # Draw Text
         script_path = os.path.abspath(os.path.dirname(__file__))
-        font_path = os.path.join(script_path, 'RobotoMono.ttf')
-        font = ImageFont.truetype(font=font_path, size=15)
+        font_path = os.path.join(script_path, 'Ubuntu.ttf')
+        font = ImageFont.truetype(font=font_path, size=24)
         ascent, descent = font.getmetrics()
         (font_width, baseline) = font.getsize('M')
         line_height = ascent + descent
@@ -73,17 +73,18 @@ class Main(QWidget):
         text = self.edit.toPlainText()
         paragraphs = text.splitlines()
 
-        lines = []
-        for p in paragraphs:
-            wrapped = textwrap.wrap(
-                p,
-                width=int(im.size[0] / font_width),
-                replace_whitespace=False,
-                drop_whitespace=False)
-            if (len(wrapped) > 0):
-                lines += wrapped
-            else:
-                lines += ['']
+        lines = paragraphs
+        # lines = []
+        # for p in paragraphs:
+        #     wrapped = textwrap.wrap(
+        #         p,
+        #         width=int(im.size[0] / font_width),
+        #         replace_whitespace=False,
+        #         drop_whitespace=False)
+        #     if (len(wrapped) > 0):
+        #         lines += wrapped
+        #     else:
+        #         lines += ['']
 
         lineCount = len(lines)
 
