@@ -29,16 +29,16 @@ class Main(QWidget):
         self.pic.setSizeAdjustPolicy(
             QAbstractScrollArea.AdjustToContents)
         self.pic.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.pic.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.pic.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.pic.setAlignment(Qt.AlignTop)
         self.pic.setObjectName("pic")
-        self.pic.setStyleSheet("""
-            QGraphicsView { 
-                max-width: 384px; 
-                max-height: 384px;
-                background: white; 
-            }
-        """)
+        # self.pic.setStyleSheet("""
+        #    QGraphicsView {
+        #        max-width: 384px;
+        #        max-height: 384px;
+        #        background: white;
+        #    }
+        # """)
         self.update_preview()
 
         self.button = QPushButton("Print!")
