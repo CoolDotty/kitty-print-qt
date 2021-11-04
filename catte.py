@@ -7,7 +7,6 @@ import crcmod.predefined
 from bleak import BleakClient
 import sys
 import argparse
-import time
 
 crc = crcmod.predefined.mkCrcFun("crc-8")
 
@@ -61,11 +60,14 @@ async def run(bdaddr, image, feed_after, mtu):
         print("Connected.", flush=True)
         print("Sending", end="", flush=True)
 
+        count = 0
         while len(buf) > mtu:
             await client.write_gatt_char(char, buf[0:mtu], True)
             buf = buf[mtu:]
             print(".", end="", flush=True)
-            time.sleep(0.025)
+            if count % 16 == 0:
+                await asyncio.sleep(0.5)
+            count += 1
 
         if len(buf) > 0:
             await client.write_gatt_char(char, buf, True)
