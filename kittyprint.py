@@ -4,7 +4,8 @@ import os.path
 import catte
 from PyQt5.QtWidgets import (
     QPlainTextEdit, QPushButton, QApplication, QVBoxLayout,
-    QWidget, QGraphicsView, QFrame, QAbstractScrollArea, QGraphicsScene, QGraphicsPixmapItem)
+    QWidget, QGraphicsView, QFrame, QAbstractScrollArea, QGraphicsScene, QGraphicsPixmapItem,
+    QMainWindow)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QSize, QRectF
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
@@ -13,10 +14,10 @@ import textwrap
 import asyncio
 
 
-class Main(QWidget):
+class TextPrinter(QWidget):
 
     def __init__(self, parent=None):
-        super(Main, self).__init__(parent)
+        super(TextPrinter, self).__init__(parent)
         # Create widgets
         self.edit = QPlainTextEdit()
         self.edit.setPlaceholderText("Write text here")
@@ -154,7 +155,9 @@ if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
-    main = Main()
-    main.show()
+    mainWindow = QMainWindow()
+    textPrinter = TextPrinter()
+    mainWindow.setCentralWidget(textPrinter)
+    mainWindow.show()
     # Run the main Qt loop
     sys.exit(app.exec())
