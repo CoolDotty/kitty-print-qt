@@ -144,8 +144,8 @@ class Main(QWidget):
         async def coroutine():
             try:
                 await catte.run('60:16:55:C1:AE:10', image_buffer, 128, 25)
-            except:
-                print('Error connecting.')
+            except Exception as e:
+                print(e)
 
         loop.run_until_complete(coroutine())
 
